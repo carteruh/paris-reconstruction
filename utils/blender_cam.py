@@ -1,6 +1,7 @@
 import bpy
 import json
 import numpy as np
+import os
 
 def add_lighting():
     # add a new light
@@ -16,6 +17,8 @@ def camera_setting(exp_dir, n_frames=100, stage='train', track_to='start'):
     add_lighting()
 
     cam_obj = bpy.data.objects['Camera']
+    constraint = cam_obj.constraints.new(type='TRACK_TO')
+    constraint.target = None
     cam_obj.constraints["Track To"].target = bpy.data.objects[track_to]
     bpy.context.scene.frame_end = n_frames - 1
     bpy.context.scene.frame_start = 0
@@ -131,13 +134,24 @@ def camera_export(stage='train'):
         fh.close()
 
 if __name__ == "__main__":
+    obj_id = '101217'
+    obj_state = 'end'
+    obj_category = 'Knife'
     # render configs
-    ROOT = '/path/to/save/rendered/images/and/camera/parameters/'
+    ROOT = f'/media/qil/DATA/Carter_Articulated_Objects/paris-reconstruction/load/sapien_example/{obj_category}/{obj_id}/{obj_state}'
+    
+    # Set Configs
+    os.makedirs(ROOT, exist_ok=True)
     n_frames = 100  # number of frames to render
-    stage = 'train' # ['train', 'val', 'test']
-    track_to = 'start'  # the object name that camera should track to
+    stage = 'test' # ['train', 'val', 'test']
+    track_to = obj_state  # the object name that camera should track to
 
+    if "Cube" in bpy.data.objects:
+        bpy.data.objects['Cube'].select_set(True)
+        bpy.ops.object.delete(use_global=False)
+        
     # STEP 0: Load .obj files into the blender scene
+    bpy.ops.import_scene.obj(filepath=f"/media/qil/DATA/Carter_Articulated_Objects/paris-reconstruction/data/sapien/{obj_category}/{obj_id}/textured_objs/{obj_state}/{obj_state}.obj")
 
     # STEP 1: Config the camera setting
     camera_setting(exp_dir=ROOT, n_frames=n_frames, stage=stage, track_to=track_to)

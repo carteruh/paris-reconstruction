@@ -54,7 +54,7 @@ class SaverMixin():
         if draw_axis: # project axis to the image
             assert axis_info is not None
             p_gt = axis_info['GT'].round().astype(np.int16)
-            p_pred = axis_info['pred'].round().astype(np.int16)
+            p_pred = axis_info['pred'].round().astype(np.int16) # check if 2D array or 3D array
             img = cv2.arrowedLine(img, p_gt[0], p_gt[1], color=(0, 255, 0), thickness=2)
             img = cv2.arrowedLine(img, p_pred[0], p_pred[1], color=(0, 0, 255), thickness=2)
 
